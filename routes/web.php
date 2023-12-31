@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
@@ -26,8 +27,13 @@ Route::get('/dashboard', function(){ return View('dashboard');})->name('dashboar
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function(){
     
     Route::get('/', function(){ return redirect()->route('admin.dashboard.home');});
-    Route::get('/dashboard', [AdminDashboardController::class, 'home'])->name('admin.dashboard.home');
-    Route::get('/products', [AdminDashboardController::class, 'home'])->name('admin.dashboard.products');
+
+    Route::middleware(['auth','verified'])->prefix('dashboard')->group(function(){ 
+
+        Route::get('/', [AdminDashboardController::class, 'home'])->name('admin.dashboard.home');
+        Route::get('/products', [AdminDashboardController::class, 'home'])->name('admin.dashboard.products');
+        Route::get('/products/create', [AdminDashboardController::class, 'createProduct'])->name('admin.dashboard.products.create');
+    });
 
 });
 
@@ -48,5 +54,14 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
  
     return redirect()->route('site.home');
 })->middleware(['auth', 'signed'])->name('verification.verify');
+
+
+// Product Routes
+
+Route::middleware(['auth','verified'])->prefix('products')->group(function() {
+   Route::post('list',[ProductController::class, 'list'])->name('products.list');
+   Route::post('create',[ProductController::class, 'store'])->name('products.create');
+   Route::post('addphoto',[ProductController::class, 'addphoto'])->name('products.addphoto');
+});
 
 require __DIR__.'/auth.php';

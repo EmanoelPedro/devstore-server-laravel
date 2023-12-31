@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProductRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,11 +25,15 @@ class AdminDashboardController extends Controller
     public function home() 
     {
         $user = User::find(Auth::id());
-        // Auth::user()->assignRole('admin');
         $permissions =(array)Auth::user()->getPermissionsViaRoles()->all();
         foreach($permissions as $permission){
             var_dump($permission->name);
         }
         return View('admin.dashboard');
+    }
+
+    public function createProduct() 
+    {
+        return View('admin/create-product');
     }
 }
