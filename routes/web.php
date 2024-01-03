@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function(){
         Route::get('/', [AdminDashboardController::class, 'home'])->name('admin.dashboard.home');
         Route::get('/products', [AdminDashboardController::class, 'home'])->name('admin.dashboard.products');
         Route::get('/products/create', [AdminDashboardController::class, 'createProduct'])->name('admin.dashboard.products.create');
+        Route::get('/products/edit/{id}', [AdminDashboardController::class, 'editProduct'])->name('admin.dashboard.products.edit');
     });
 
 });
@@ -59,9 +60,11 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 // Product Routes
 
 Route::middleware(['auth','verified'])->prefix('products')->group(function() {
-   Route::post('list',[ProductController::class, 'list'])->name('products.list');
    Route::post('create',[ProductController::class, 'store'])->name('products.create');
+   Route::delete('delete/{id}',[ProductController::class, 'destroy'])->name('products.delete');
    Route::post('addphoto',[ProductController::class, 'addphoto'])->name('products.addphoto');
 });
+
+Route::get('/products/{id}',[ProductController::class, 'index'])->name('products.list');
 
 require __DIR__.'/auth.php';

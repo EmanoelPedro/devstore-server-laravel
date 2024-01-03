@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->decimal('price',10,2);
             $table->string('code');
-            $table->string('status')->default('draft');
+            $table->string('status');
             $table->longtext('description');
             $table->timestamps();
             $table->softDeletes();
