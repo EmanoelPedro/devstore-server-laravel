@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('carts_products', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('slug')->unique();
-            $table->decimal('price',255,2);
-            $table->string('code');
-            $table->string('status');
-            $table->longtext('description');
+            $table->char('cart_id', 36);
+            $table->unsignedBigInteger('product_id');
             $table->timestamps();
-            $table->softDeletes();
+
+            $table->foreign('cart_id')->references('id')->on('carts')->onDelete('CASCADE');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('CASCADE');
         });
     }
 
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('cart_products');
     }
 };

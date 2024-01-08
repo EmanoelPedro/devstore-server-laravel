@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class UpdateProductRequest extends FormRequest
+class StoreCartRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,11 +16,7 @@ class UpdateProductRequest extends FormRequest
             return false;
         }
 
-        $user = Auth::user();
-        if($user->hasPermissionTo("edit products")) {
-           return true; 
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -31,10 +27,7 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|unique:products|max:255',
-            'price' => 'required|numeric|between:0.01,999999.99',
-            'description' => 'required',
-            'status' => 'required'
+            //
         ];
     }
 }

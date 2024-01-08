@@ -7,7 +7,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\ProductPhoto;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -41,7 +41,7 @@ class ProductController extends Controller
                 
         $data['slug'] = Str::slug($data['name'],'-');
         $data['code'] = Str::upper(Str::random(8));
-        // die();
+
         $product = Product::create($data);
 
         if($product->id) {
@@ -122,7 +122,9 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+        $data = $request->validated();
+        
+        
     }
 
     /**
@@ -157,5 +159,16 @@ class ProductController extends Controller
             'status' => 'error',
             'message' => 'failed to delete product'
         ]);
+    }
+
+    public function addToCard() 
+    {
+        $data = request()->validate([
+            'product_id' => 'required|exists:products,id'
+        ]);
+
+        $user = Auth::user();
+    
+        $user->addToCart($data['product_id']);
     }
 }

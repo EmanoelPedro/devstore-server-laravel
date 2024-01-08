@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -62,8 +63,24 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 Route::middleware(['auth','verified'])->prefix('products')->group(function() {
    Route::post('create',[ProductController::class, 'store'])->name('products.create');
    Route::delete('delete/{id}',[ProductController::class, 'destroy'])->name('products.delete');
+   Route::put('update',[ProductController::class, 'destroy'])->name('products.update');
    Route::post('addphoto',[ProductController::class, 'addphoto'])->name('products.addphoto');
+Route::post('addtocard',[ProductController::class, 'addToCard'])->name('products.addToCard');
+
 });
+
+
+// Cart Routes
+
+Route::middleware(['auth','verified'])->prefix('cart')->group(function() {
+    Route::post('create', [CartController::class, 'store'])->name('cart.create');
+    Route::post('addproduct', [CartController::class, 'addProduct'])->name('cart.addProduct');
+    Route::post('delete', [CartController::class, 'destroy'])->name('cart.delete');
+
+    Route::get('mycart', [CartController::class, 'show'])->name('cart.mycart');
+});
+
+
 
 Route::get('/products/{id}',[ProductController::class, 'index'])->name('products.list');
 
