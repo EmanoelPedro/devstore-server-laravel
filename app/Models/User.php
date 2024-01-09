@@ -80,24 +80,66 @@ class User extends Authenticatable implements MustVerifyEmail
         return null;
     }
 
-    public function addToCart(string $productId)
+    public function addToCart(string $productId,int $quantity = 1): false|User
     {
         $product = Product::find($productId);
         
         if(empty($product)) {
-            return false;
+            return false;       
         }
 
         if($this->haveOpenCart() == false) {
             $this->createOpenCart();
         }
         $cart = $this->getOpenCart();
-        var_dump($cart->id);
-        $products = $cart->products();
-        // dd($cart->id);
-        var_dump($products->getQuery());
-        foreach($products as $product) {
-            var_dump($product);
+
+        
+        if($cart->products()->find($product->id) == null) {
+            $cart->products()->attach($product->id, ['quantity' => $quantity,'created_at' => now()]);
+            return $this;
         }
+
+        $productQuantity = $cart->products()->find($product->id)->pivot->quantity;
+
+        $cart->products()->updateExistingPivot($product->id,['quantity' => $productQuantity + $quantity]);
+
+        return $this;
+    }
+
+    public function removeToCart(string $productId, $quantity = 1): bool|User
+    {
+        $product = Product::find($productId);
+        
+        if(empty($product)) {
+            return false;       
+        }
+
+        if($this->haveOpenCart() == false) {
+            return false;
+        }
+
+        if($quantity <= 0) {
+            return false;
+        }
+
+        $cart = $this->getOpenCart();
+
+        
+        if($cart->products()->find($product->id) == null) {
+            return false;
+        }
+
+        $productQuantity = $cart->products()->find($product->id)->pivot->quantity;
+
+
+        if($productQuantity <= $quantity) {
+            $cart->products()->detach($product->id);
+            return true;
+        }
+
+        $cart->products()->updateExistingPivot($product->id,['quantity' => $productQuantity - $quantity]);
+
+        var_dump($cart->products()->find($product->id)->pivot->quantity);
+        return $this;
     }
 }

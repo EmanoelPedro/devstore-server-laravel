@@ -168,7 +168,9 @@ class ProductController extends Controller
         ]);
 
         $user = Auth::user();
-    
-        $user->addToCart($data['product_id']);
+
+        var_dump(
+        $user->removeToCart($data['product_id'],65)
+        );
     }
 }

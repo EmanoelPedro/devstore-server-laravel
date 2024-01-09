@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->char('cart_id', 36);
             $table->unsignedBigInteger('product_id');
+            $table->integer('quantity');
             $table->timestamps();
 
             $table->foreign('cart_id')->references('id')->on('carts')->onDelete('CASCADE');
