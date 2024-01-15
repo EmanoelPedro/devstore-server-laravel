@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -79,6 +80,12 @@ Route::middleware(['auth','verified'])->prefix('cart')->group(function() {
 
     Route::get('mycart', [CartController::class, 'show'])->name('cart.mycart');
 });
+
+// Checkout Routes
+
+Route::middleware(['auth','verified'])->prefix('checkout')->group(function(){
+    Route::get('payment',[CheckoutController::class, 'create']);
+}); 
 
 
 

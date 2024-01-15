@@ -56,6 +56,7 @@ class CreateDefaultMasterAdmin extends Command
             " remember to change your email and password to avoid hackers when in production! \n" . PHP_EOL);
             die();
         }
+
         // Insert User in DB
         $user = User::create([
             'first_name'=> $first_name,
@@ -75,6 +76,10 @@ class CreateDefaultMasterAdmin extends Command
         $permissions[3] = Permission::create(['name' => 'create role']);
         $permissions[4] = Permission::create(['name' => 'edit role']);
         $permissions[5] = Permission::create(['name' => 'delete role']);
+
+        $permissions[6] = Permission::create(['name' => 'create products']);
+        $permissions[7] = Permission::create(['name' => 'edit products']);
+        $permissions[8] = Permission::create(['name' => 'delete products']);
 
         $role->syncPermissions($permissions);
 

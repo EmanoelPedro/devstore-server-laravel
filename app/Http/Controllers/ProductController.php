@@ -7,6 +7,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\ProductPhoto;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -161,16 +162,54 @@ class ProductController extends Controller
         ]);
     }
 
-    public function addToCard() 
+    public function addToCard(Request $request) 
     {
-        $data = request()->validate([
-            'product_id' => 'required|exists:products,id'
+        $data = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'numeric|max_digits:60'
         ]);
+        
+        $productId = $data['product_id'];
 
+        $quantity = (!empty($data['quantity'])) ? $data['quantity'] : 1;
+
+        if(!$request->session()->has('cart')) {
+
+            $request->session()->put('cart' ,[
+                'products' => [
+                    $productId => [
+                      'quantity' => $quantity,
+                    ]
+                ]
+            ]); 
+            
+        } 
+
+        $products = session()->get('cart.products');
+
+         if(array_key_exists($productId,$products)) {
+    
+            $request->session()->increment("cart.products.{$productId}.quantity",$quantity);
+         } else {
+            $request->session()->put("cart.products.{$productId}", [
+              'quantity' => $quantity
+            ]);
+         }
+         
+         dd($request->session()->get('cart.products'));
+        die();
         $user = Auth::user();
 
-        var_dump(
-        $user->removeToCart($data['product_id'],65)
-        );
+        if(!empty($user) && $user->addToCart($productId, $quantity) !== false) {
+          return response()->json([
+                'status' => 'success',
+                'message' => 'product added successfully'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'failed to add the product'
+            ]);
+        }
     }
 }

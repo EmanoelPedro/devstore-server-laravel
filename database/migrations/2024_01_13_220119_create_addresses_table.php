@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carts', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->unsignedBigInteger('user_id');
-            $table->string('status');
+        Schema::create('addresses', function (Blueprint $table) {
+            $table->id();
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('CASCADE');
         });
     }
 
@@ -26,7 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::disableForeignKeyConstraints();
-        Schema::dropIfExists('carts');
+        Schema::dropIfExists('addresses');
     }
 };
