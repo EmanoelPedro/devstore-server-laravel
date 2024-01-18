@@ -27,19 +27,26 @@ Route::get('/dashboard', function(){ return View('dashboard');})->name('dashboar
 
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function(){
-    
+
     Route::get('/', function(){ return redirect()->route('admin.dashboard.home');});
 
-    Route::middleware(['auth','verified'])->prefix('dashboard')->group(function(){ 
+    Route::middleware(['auth','verified'])->prefix('dashboard')->group(function(){
 
         Route::get('/', [AdminDashboardController::class, 'home'])->name('admin.dashboard.home');
-        Route::get('/products', [AdminDashboardController::class, 'home'])->name('admin.dashboard.products');
-        Route::get('/products/create', [AdminDashboardController::class, 'createProduct'])->name('admin.dashboard.products.create');
-        Route::get('/products/edit/{id}', [AdminDashboardController::class, 'editProduct'])->name('admin.dashboard.products.edit');
+
+        Route::get('/products', [AdminDashboardController::class, 'home'])
+            ->name('admin.dashboard.products');
+
+        Route::get('/products/create', [AdminDashboardController::class, 'createProduct'])
+            ->name('admin.dashboard.products.create');
+
+        Route::get('/products/edit/{id}', [AdminDashboardController::class, 'editProduct'])
+            ->name('admin.dashboard.products.edit');
     });
 
 });
 
+// Profile
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -47,32 +54,32 @@ Route::middleware('auth')->group(function () {
 });
 
 // Verification Email Routes
-
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
- 
+
     return redirect()->route('site.home');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 
 // Product Routes
-
 Route::middleware(['auth','verified'])->prefix('products')->group(function() {
-   Route::post('create',[ProductController::class, 'store'])->name('products.create');
+
+    Route::post('create',[ProductController::class, 'store'])->name('products.create');
    Route::delete('delete/{id}',[ProductController::class, 'destroy'])->name('products.delete');
    Route::put('update',[ProductController::class, 'destroy'])->name('products.update');
    Route::post('addphoto',[ProductController::class, 'addphoto'])->name('products.addphoto');
-Route::post('addtocard',[ProductController::class, 'addToCard'])->name('products.addToCard');
+
+   Route::post('addtocard',[ProductController::class, 'addToCard'])->name('products.addToCard');
+Route::post('removetocard',[ProductController::class, 'removeToCard'])->name('products.addToCard');
 
 });
 
 
 // Cart Routes
-
 Route::middleware(['auth','verified'])->prefix('cart')->group(function() {
     Route::post('create', [CartController::class, 'store'])->name('cart.create');
     Route::post('addproduct', [CartController::class, 'addProduct'])->name('cart.addProduct');
@@ -82,11 +89,9 @@ Route::middleware(['auth','verified'])->prefix('cart')->group(function() {
 });
 
 // Checkout Routes
-
 Route::middleware(['auth','verified'])->prefix('checkout')->group(function(){
     Route::get('payment',[CheckoutController::class, 'create']);
-}); 
-
+});
 
 
 Route::get('/products/{id}',[ProductController::class, 'index'])->name('products.list');

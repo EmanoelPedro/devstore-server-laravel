@@ -19,7 +19,7 @@ class ProductController extends Controller
      */
     public function index($id)
     {
-        $product = Product::find($id)->first(); 
+        $product = Product::find($id)->first();
         $photos = $product->photos->all();
         return view('product', ['product' => $product, 'photos'=> $photos]);
     }
@@ -39,7 +39,7 @@ class ProductController extends Controller
     {
 
         $data = $request->validated();
-                
+
         $data['slug'] = Str::slug($data['name'],'-');
         $data['code'] = Str::upper(Str::random(8));
 
@@ -53,7 +53,7 @@ class ProductController extends Controller
         }
     }
 
-    public function addPhoto(StoreProductPhotoRequest $request) 
+    public function addPhoto(StoreProductPhotoRequest $request)
     {
         $data = $request->validated();
 
@@ -72,13 +72,14 @@ class ProductController extends Controller
         }
 
         $photoPath = $request->file('photo')->storePublicly("products/{$data['product_id']}",'public');
-     
-        $photoUrl = asset("storage/" .$request->file('photo')->storePublicly("products/{$data['product_id']}",'public'));
+
+        $photoUrl = asset("storage/" .$request->file('photo')
+                ->storePublicly("products/{$data['product_id']}",'public'));
 
         if(empty($photoPath)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error saving image'
+                'message' => 'Error savc8ing image'
             ]);
         }
 
@@ -89,12 +90,12 @@ class ProductController extends Controller
            'path' => $photoPath,
            'url' => $photoUrl
         ]);
-    
+
         if(!$photo){
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error saving image'
-            ]); 
+            ]);
         }
 
         return response()->json([
@@ -124,8 +125,8 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $data = $request->validated();
-        
-        
+
+
     }
 
     /**
@@ -134,7 +135,7 @@ class ProductController extends Controller
     public function destroy($product)
     {
         $product = Product::find($product);
-        
+
         if(!$product) {
             return response()->json([
                 'status' => 'error',
@@ -162,48 +163,92 @@ class ProductController extends Controller
         ]);
     }
 
-    public function addToCard(Request $request) 
+    public function addToCard(Request $request)
     {
         $data = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'numeric|max_digits:60'
         ]);
-        
+
         $productId = $data['product_id'];
 
         $quantity = (!empty($data['quantity'])) ? $data['quantity'] : 1;
 
         if(!$request->session()->has('cart')) {
 
-            $request->session()->put('cart' ,[
-                'products' => [
-                    $productId => [
-                      'quantity' => $quantity,
-                    ]
-                ]
-            ]); 
-            
-        } 
+            $request->session()->put('cart.products', [] );
 
-        $products = session()->get('cart.products');
+        }
 
-         if(array_key_exists($productId,$products)) {
-    
+
+
+        if(session()->has("cart.products.{$productId}")) {
+
             $request->session()->increment("cart.products.{$productId}.quantity",$quantity);
-         } else {
-            $request->session()->put("cart.products.{$productId}", [
-              'quantity' => $quantity
-            ]);
-         }
-         
-         dd($request->session()->get('cart.products'));
-        die();
+
+        } else {
+            $request->session()->put("cart.products.{$productId}",  ['quantity' => $quantity] );
+            }
+
+            $request->session()->save();
+
+
         $user = Auth::user();
 
         if(!empty($user) && $user->addToCart($productId, $quantity) !== false) {
           return response()->json([
                 'status' => 'success',
-                'message' => 'product added successfully'
+                'message' => 'product added successfully',
+                'product_quantity' => $request->session()->get("cart.products.{$productId}.quantity")
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'failed to add the product'
+            ]);
+        }
+    }
+
+    public function removeToCard(Request $request)
+    {
+        $data = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'numeric|max_digits:60'
+        ]);
+
+        $productId = $data['product_id'];
+
+        $quantity = (!empty($data['quantity'])) ? $data['quantity'] : 1;
+
+        if(!$request->session()->has('cart')) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'failed to remove the product'
+            ]);
+
+        }
+
+        if(session()->has("cart.products.{$productId}") && session()->get("cart.products.{$productId}.quantity") > 0) {
+
+            $request->session()->decrement("cart.products.{$productId}.quantity",$quantity);
+
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'failed to remove the product'
+            ]);
+        }
+
+            $request->session()->save();
+
+
+        $user = Auth::user();
+
+        if(!empty($user) && $user->removeToCart($productId, $quantity) !== false) {
+          return response()->json([
+                'status' => 'success',
+                'message' => 'product removed successfully',
+                'product_quantity' => $request->session()->get("cart.products.{$productId}.quantity")
             ]);
         } else {
             return response()->json([

@@ -13,7 +13,7 @@ class CheckoutController extends Controller
      */
     public function index()
     {
-        //
+        return view('pages.checkout');
     }
 
     /**
@@ -41,7 +41,7 @@ class CheckoutController extends Controller
             'success_url' => 'http://localhost:4242/success',
             'cancel_url' => 'http://localhost:4242/cancel',
           ]);
-          
+
           header("HTTP/1.1 303 See Other");
          return redirect($checkout_session->url);
     }
