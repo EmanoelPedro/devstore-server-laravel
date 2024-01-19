@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserAddressController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -26,7 +27,8 @@ Route::get('/', function () {
 Route::get('/dashboard', function(){ return View('dashboard');})->name('dashboard');
 
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function(){
+Route::middleware(['auth', 'verified'])->prefix('admin')->group(function()
+    {
 
     Route::get('/', function(){ return redirect()->route('admin.dashboard.home');});
 
@@ -47,14 +49,21 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function(){
 });
 
 // Profile
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function ()
+{
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/profile/address', [UserAddressController::class,'index'])->name('profile.address');
+    Route::post('/profile/address', [UserAddressController::class,'store'])->name('profile.address');
+    Route::patch('/profile/address', [UserAddressController::class,'update'])->name('profile.address');
+    Route::delete('/profile/address', [UserAddressController::class,'destroy'])->name('profile.address');
 });
 
 // Verification Email Routes
-Route::get('/email/verify', function () {
+Route::get('/email/verify', function ()
+{
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 

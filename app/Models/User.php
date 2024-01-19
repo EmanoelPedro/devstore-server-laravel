@@ -83,9 +83,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function addToCart(string $productId,int $quantity = 1): false|User
     {
         $product = Product::find($productId);
-        
+
         if(empty($product)) {
-            return false;       
+            return false;
         }
 
         if($this->haveOpenCart() == false) {
@@ -93,7 +93,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
         $cart = $this->getOpenCart();
 
-        
+
         if($cart->products()->find($product->id) == null) {
             $cart->products()->attach($product->id, ['quantity' => $quantity,'created_at' => now()]);
             return $this;
@@ -109,9 +109,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function removeToCart(string $productId, $quantity = 1): bool|User
     {
         $product = Product::find($productId);
-        
+
         if(empty($product)) {
-            return false;       
+            return false;
         }
 
         if($this->haveOpenCart() == false) {
@@ -124,7 +124,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $cart = $this->getOpenCart();
 
-        
+
         if($cart->products()->find($product->id) == null) {
             return false;
         }
@@ -141,5 +141,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
         var_dump($cart->products()->find($product->id)->pivot->quantity);
         return $this;
+    }
+
+    public function address(): HasOne
+    {
+        return $this->hasOne(UserAddress::class);
     }
 }

@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAddressRequest;
-use App\Http\Requests\UpdateAddressRequest;
-use App\Models\Address;
+use App\Http\Requests\StoreUserAddressRequest;
+use App\Http\Requests\UpdateUserAddressRequest;
+use App\Models\UserAddress;
 
-class AddressController extends Controller
+class UserAddressController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return view('profile.address');
     }
 
     /**
@@ -27,15 +27,15 @@ class AddressController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAddressRequest $request)
+    public function store(StoreUserAddressRequest $request)
     {
-        //
+        dd($request->validated());
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Address $address)
+    public function show(UserAddress $address)
     {
         //
     }
@@ -43,7 +43,7 @@ class AddressController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Address $address)
+    public function edit(UserAddress $address)
     {
         //
     }
@@ -51,7 +51,7 @@ class AddressController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAddressRequest $request, Address $address)
+    public function update(UpdateUserAddressRequest $request, UserAddress $address)
     {
         //
     }
@@ -59,7 +59,7 @@ class AddressController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Address $address)
+    public function destroy(UserAddress $address)
     {
         //
     }
