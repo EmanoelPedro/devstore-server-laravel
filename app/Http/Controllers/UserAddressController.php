@@ -29,7 +29,38 @@ class UserAddressController extends Controller
      */
     public function store(StoreUserAddressRequest $request)
     {
-        dd($request->validated());
+        $data = $request->validated();
+        $user = \Auth::user();
+
+        if (!empty($user->address()->first())) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The user can only have one registered address'
+            ],409);
+        }
+
+        $userAddress = new UserAddress();
+        $userAddress->user_id = $user->id;
+        $userAddress->country = $data['country'];
+        $userAddress->state = $data['state'];
+        $userAddress->city = $data['city'];
+        $userAddress->phone = $data['phone'];
+        $userAddress->address = $data['address'];
+        $userAddress->postal_code = $data['postal_code'];
+        $userAddress->details = $data['details'];
+
+        if ($userAddress->save() == true) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Address registered successfully'
+            ],201);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error registering address, please try again in a few minutes'
+        ],500);
+
     }
 
     /**

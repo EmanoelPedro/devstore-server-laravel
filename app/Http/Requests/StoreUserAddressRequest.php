@@ -15,13 +15,12 @@ class StoreUserAddressRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' =>        'required|unique:users,id',
             'country' =>        'required',
             'state' =>          'required',
             'city' =>           'required',
-            'address' =>        'required|max_digits:20',
-            'postal_code' =>    'required|max_digits:15',
-            'phone' =>          'required|max_digits:15',
+            'address' =>        'required|max:255',
+            'postal_code' =>    'required|numeric',
+            'phone' =>          'required|numeric',
             'details' =>         'required',
         ];
     }
