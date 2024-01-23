@@ -23,27 +23,36 @@ class CheckoutController extends Controller
     {
         $stripe = new \Stripe\StripeClient(getenv('PAYMENT_API_TEST_KEY'));
 
-        $
+        $cart = \Auth::user()->carts()->where('status', 'open')->first();
+        $products = $cart->products()->get();
 
+        if ($products->isEmpty()) {
+            return redirect()->route('cart.index');
+        }
 
-        $checkout_session = $stripe->checkout->sessions->create([
-            'line_items' => [[
-              'price_data' => [
-                'currency' => 'usd',
-                'product_data' => [
-                  'name' => 'T-shirt',
-                ],
-                'unit_amount' => 2000,
-              ],
-              'quantity' => 1,
-            ]],
+        foreach ($products as $product) {
+             $pdts[] = [
+                 'price_data' => [
+                     'currency' => 'brl',
+                     'product_data' => [
+                         'name' => "{$product->name}",
+                     ],
+                     'unit_amount' => intval($product->price * 100),
+                 ],
+                 'quantity' => "{$product->pivot->quantity}",
+             ];
+        }
+
+        $session = $stripe->checkout->sessions->create([
+            'payment_method_types' => ['card'],
+            'line_items' => [
+                $pdts
+            ],
             'mode' => 'payment',
-            'success_url' => 'http://localhost:4242/success',
-            'cancel_url' => 'http://localhost:4242/cancel',
-          ]);
-
-          header("HTTP/1.1 303 See Other");
-         return redirect($checkout_session->url);
+            'success_url' => 'https://example.com/success',
+            'cancel_url' => route('cart.index'),
+        ]);
+       return redirect($session->url, 303);
     }
 
     /**

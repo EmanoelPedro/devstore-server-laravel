@@ -13,7 +13,8 @@ class UserAddressController extends Controller
      */
     public function index()
     {
-        return view('profile.address');
+        $address = \Auth::user()->address()->first();
+        return view('profile.address', compact('address'));
     }
 
     /**
@@ -84,7 +85,21 @@ class UserAddressController extends Controller
      */
     public function update(UpdateUserAddressRequest $request, UserAddress $address)
     {
-        //
+        $address = \Auth::user()->address()->first();
+
+        if ($address->update($request->validated())) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Address updated successfully'
+            ],200);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error updating address, please try again in a few minutes'
+        ],500);
+
+        dd($request->validated(),$address);
     }
 
     /**
@@ -92,6 +107,18 @@ class UserAddressController extends Controller
      */
     public function destroy(UserAddress $address)
     {
-        //
+        $address = \Auth::user()->address()->first();
+
+        if ($address->delete()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Address deleted successfully'
+            ],200);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Error deleting address, please try again in a few minutes'
+        ],500);
     }
 }

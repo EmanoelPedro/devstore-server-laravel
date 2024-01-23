@@ -78,30 +78,30 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 Route::middleware(['auth','verified'])->prefix('products')->group(function() {
 
     Route::post('create',[ProductController::class, 'store'])->name('products.create');
-   Route::delete('delete/{id}',[ProductController::class, 'destroy'])->name('products.delete');
-   Route::put('update',[ProductController::class, 'destroy'])->name('products.update');
-   Route::post('addphoto',[ProductController::class, 'addphoto'])->name('products.addphoto');
+    Route::delete('delete/{id}',[ProductController::class, 'destroy'])->name('products.delete');
+    Route::put('update',[ProductController::class, 'destroy'])->name('products.update');
+    Route::post('addphoto',[ProductController::class, 'addphoto'])->name('products.addphoto');
 
-   Route::post('addtocard',[ProductController::class, 'addToCard'])->name('products.addToCard');
-Route::post('removetocard',[ProductController::class, 'removeToCard'])->name('products.addToCard');
-
+    Route::post('addtocart',[ProductController::class, 'addToCart'])->name('products.addToCart');
+    Route::post('removetocart',[ProductController::class, 'removeToCart'])->name('products.removeToCart');
 });
 
 
 // Cart Routes
 Route::middleware(['auth','verified'])->prefix('cart')->group(function() {
-    Route::post('create', [CartController::class, 'store'])->name('cart.create');
-    Route::post('addproduct', [CartController::class, 'addProduct'])->name('cart.addProduct');
-    Route::post('delete', [CartController::class, 'destroy'])->name('cart.delete');
 
-    Route::get('mycart', [CartController::class, 'show'])->name('cart.mycart');
+    Route::get('mycart',[CartController::class, 'index'])->name('cart.index');
+
+    Route::post('/', [CartController::class, 'store'])->name('cart.create');
+    Route::patch('/', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/', [CartController::class, 'destroy'])->name('cart.delete');
+
 });
 
 // Checkout Routes
 Route::middleware(['auth','verified'])->prefix('checkout')->group(function(){
     Route::get('payment',[CheckoutController::class, 'create']);
 });
-
 
 Route::get('/products/{id}',[ProductController::class, 'index'])->name('products.list');
 

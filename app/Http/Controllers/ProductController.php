@@ -163,7 +163,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function addToCard(Request $request)
+    public function addToCart(Request $request)
     {
         $data = $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -209,7 +209,7 @@ class ProductController extends Controller
         }
     }
 
-    public function removeToCard(Request $request)
+    public function removeToCart(Request $request)
     {
         $data = $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -228,12 +228,29 @@ class ProductController extends Controller
 
         }
 
-        if(session()->has("cart.products.{$productId}") && session()->get("cart.products.{$productId}.quantity") > 0) {
+        if (!session()->has("cart.products.{$productId}")) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'failed to remove the product'
+            ]);
+        }
+
+        if(session()->get("cart.products.{$productId}.quantity") > 0) {
+
+            if (session()->get("cart.products.{$productId}.quantity") < $data['quantity']) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'failed to remove the product'
+                ]);
+            }
 
             $request->session()->decrement("cart.products.{$productId}.quantity",$quantity);
+            if (session()->get("cart.products.{$productId}.quantity") == 0) {
+                $request->session()->forget("cart.products.{$productId}");
+            }
 
         } else {
-            return response()->json([
+            response()->json([
                 'status' => 'error',
                 'message' => 'failed to remove the product'
             ]);
@@ -246,9 +263,8 @@ class ProductController extends Controller
 
         if(!empty($user) && $user->removeToCart($productId, $quantity) !== false) {
           return response()->json([
-                'status' => 'success',
+                'status' => 'sucucess',
                 'message' => 'product removed successfully',
-                'product_quantity' => $request->session()->get("cart.products.{$productId}.quantity")
             ]);
         } else {
             return response()->json([

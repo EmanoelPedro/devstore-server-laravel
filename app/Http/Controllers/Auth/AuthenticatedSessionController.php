@@ -29,6 +29,23 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $cart = $request->user()->carts();
+
+        if ($cart->where('status', 'open')->first() == null) {
+            $request->user()->carts()->create([
+                'user_id' => $request->user()->id,
+                'status' => 'open'
+            ]);
+        } else {
+            $cart = $cart->where('status', 'open')->first();
+            $products = $cart->products()->get();
+            if (!$products->isEmpty()) {
+                foreach ($products as $product) {
+                    session()->put("cart.products.{$product->id}",['quantity' => $product->pivot->quantity]);
+                }
+            }
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

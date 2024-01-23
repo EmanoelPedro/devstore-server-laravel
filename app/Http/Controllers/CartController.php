@@ -15,7 +15,7 @@ class CartController extends Controller
      */
     public function index()
     {
-        //
+        return view('pages.cart');
     }
 
     /**
@@ -31,16 +31,16 @@ class CartController extends Controller
      */
     public function store(StoreCartRequest $request)
     {
-    
+
         $user = User::find(Auth::user());
-    
+
         if(empty($user)) {
            return response()->json([
                 'status' => 'error',
                 'message' => 'User not exists'
             ], 404);
         }
-        
+
         if($user->haveOpenCart() == true){
             return response()->json([
                 "status" => "success",
@@ -72,7 +72,6 @@ class CartController extends Controller
                 'status' => 'open'
             ]);
         }
-        // dd($cart->products()->first());
 
         return view('pages.cart', ['cart' => $cart]);
     }
