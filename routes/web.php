@@ -59,6 +59,8 @@ Route::middleware('auth')->group(function ()
     Route::post('/profile/address', [UserAddressController::class,'store'])->name('profile.address');
     Route::patch('/profile/address', [UserAddressController::class,'update'])->name('profile.address');
     Route::delete('/profile/address', [UserAddressController::class,'destroy'])->name('profile.address');
+
+    Route::delete('/profile/orders', [\App\Models\UserPaymentStatus::class,'destroy'])->name('profile.orders');
 });
 
 // Verification Email Routes
@@ -101,7 +103,11 @@ Route::middleware(['auth','verified'])->prefix('cart')->group(function() {
 // Checkout Routes
 Route::middleware(['auth','verified'])->prefix('checkout')->group(function(){
     Route::get('payment',[CheckoutController::class, 'create']);
+
 });
+Route::post('checkout/payment/webhook',[CheckoutController::class, 'paymentStatusWebhook'])->name('checkout.paymentStatusResponse');
+Route::post('checkout/payment/webhook',[CheckoutController::class, 'paymentStatusWebhook'])->name('checkout.paymentStatusResponse');
+
 
 Route::get('/products/{id}',[ProductController::class, 'index'])->name('products.list');
 

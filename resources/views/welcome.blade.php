@@ -138,3 +138,4 @@
         </div>
     </body>
 </html>
+<?php var_dump(['test' => 'go', 'mode' => 'lorem']); ?>

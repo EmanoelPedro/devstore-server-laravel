@@ -88,6 +88,13 @@ return [
         ],
     ],
 
+
+    'reply_to' => ['address' => env('MAIL_REPLY_ADDRESS'), 'name' => env('MAIL_REPLY_NAME', 'GeekStore Support')],
+
+
+
+
+
     /*
     |--------------------------------------------------------------------------
     | Global "From" Address
@@ -100,8 +107,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'suport@geekstore.com'),
+        'name' => env('MAIL_FROM_NAME', 'geekstore'),
     ],
 
     /*
