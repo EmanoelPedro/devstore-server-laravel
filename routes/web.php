@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\AppController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserAddressController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Models\UserPaymentStatus;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
 
@@ -20,12 +23,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('site.home');
+Route::get('/', [AppController::class, 'home'])->name('site.home');
 
-Route::get('/dashboard', function(){ return View('dashboard');})->name('dashboard');
-
+Route::middleware(['auth','verified'])->prefix('dashboard')->group(function(){
+    Route::get('/', function(){ return View('dashboard');})->name('dashboard');
+});
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function()
     {
@@ -60,7 +62,7 @@ Route::middleware('auth')->group(function ()
     Route::patch('/profile/address', [UserAddressController::class,'update'])->name('profile.address');
     Route::delete('/profile/address', [UserAddressController::class,'destroy'])->name('profile.address');
 
-    Route::delete('/profile/orders', [\App\Models\UserPaymentStatus::class,'destroy'])->name('profile.orders');
+    Route::delete('/profile/orders', [UserPaymentStatus::class,'destroy'])->name('profile.orders');
 });
 
 // Verification Email Routes
@@ -75,6 +77,19 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
     return redirect()->route('site.home');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
+// Category Routes
+Route::get('categories/{slug}',[CategoryController::class, 'show'])->name('categories.show');
+Route::middleware(['auth','verified'])->prefix('categories')->group(function() {
+    Route::get('create',[CategoryController::class, 'create'])->name('categories.create');
+    Route::post('create',[CategoryController::class, 'store'])->name('categories.store');
+    Route::delete('delete/{id}',[CategoryController::class, 'destroy'])->name('categories.delete');
+    Route::put('update',[CategoryController::class, 'destroy'])->name('categories.update');
+
+    Route::post('addproduct', [CategoryController::class, 'addProduct'])->name('categories.addproduct');
+    Route::post('removeproduct', [CategoryController::class, 'removeProduct'])->name('categories.removeproduct');
+});
+
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 
 // Product Routes
 Route::middleware(['auth','verified'])->prefix('products')->group(function() {
@@ -84,15 +99,15 @@ Route::middleware(['auth','verified'])->prefix('products')->group(function() {
     Route::put('update',[ProductController::class, 'destroy'])->name('products.update');
     Route::post('addphoto',[ProductController::class, 'addphoto'])->name('products.addphoto');
 
-    Route::post('addtocart',[ProductController::class, 'addToCart'])->name('products.addToCart');
-    Route::post('removetocart',[ProductController::class, 'removeToCart'])->name('products.removeToCart');
+    Route::post('add-to-cart',[ProductController::class, 'addToCart'])->name('products.addToCart');
+    Route::post('remove-from-cart',[ProductController::class, 'removeFromCart'])->name('products.removeFromCart');
 });
 
 
 // Cart Routes
 Route::middleware(['auth','verified'])->prefix('cart')->group(function() {
 
-    Route::get('mycart',[CartController::class, 'index'])->name('cart.index');
+    Route::get('mycart',[CartController::class, 'index'])->name('cart.show');
 
     Route::post('/', [CartController::class, 'store'])->name('cart.create');
     Route::patch('/', [CartController::class, 'update'])->name('cart.update');
@@ -109,6 +124,6 @@ Route::post('checkout/payment/webhook',[CheckoutController::class, 'paymentStatu
 Route::post('checkout/payment/webhook',[CheckoutController::class, 'paymentStatusWebhook'])->name('checkout.paymentStatusResponse');
 
 
-Route::get('/products/{id}',[ProductController::class, 'index'])->name('products.list');
+Route::get('/products/{slug}',[ProductController::class, 'show'])->name('products.show');
 
 require __DIR__.'/auth.php';

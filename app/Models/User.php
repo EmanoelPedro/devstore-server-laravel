@@ -107,7 +107,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this;
     }
 
-    public function removeToCart(string $productId, $quantity = 1): bool|User
+    public function removeFromCart(string $productId, $quantity = 1): bool|User
     {
         $product = Product::find($productId);
 
@@ -115,7 +115,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
 
-        if($this->haveOpenCart() == false) {
+        if(!$this->haveOpenCart()) {
             return false;
         }
 
@@ -140,7 +140,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $cart->products()->updateExistingPivot($product->id,['quantity' => $productQuantity - $quantity]);
 
-        var_dump($cart->products()->find($product->id)->pivot->quantity);
         return $this;
     }
 

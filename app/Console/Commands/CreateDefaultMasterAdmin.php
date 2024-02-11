@@ -17,7 +17,7 @@ class CreateDefaultMasterAdmin extends Command
      *
      * @var string
      */
-    protected $signature = 'app:create-default-master-admin';
+    protected $signature = 'admin:create-master-admin {--email=gerent@admin.com} {--name=MasterAdmin} {--password=admin}';
 
     /**
      * The console command description.
@@ -31,7 +31,7 @@ class CreateDefaultMasterAdmin extends Command
      */
     public function handle()
     {
-        
+
         if(!Schema::hasTable('users')) {
             print("The users table does not exist in the database. Check if the migrations were run. \n");
             die();
@@ -41,18 +41,17 @@ class CreateDefaultMasterAdmin extends Command
         } else if(!Schema::hasTable('permissions')) {
             print("The roles table does not exist in the database. Check if the migrations were run. \n");
             die();
-        } 
+        }
 
 
-        $first_name = "Master";
-        $last_name = "Admin";
-        $email = "gerent@admin.com";
-        $password = Hash::make("admin");
+        $first_name = $this->option('name');
+        $email = $this->option('email');
+        $password = Hash::make($this->option('password'));
 
         if(User::where("email", $email)->first()) {
-            print(PHP_EOL ."The default administrator user has already been created in the database, ". PHP_EOL . PHP_EOL . 
+            print(PHP_EOL ."The default administrator user has already been created in the database, ". PHP_EOL . PHP_EOL .
             "Email ==> {$email}" . PHP_EOL.
-            "Password ==> admin" . PHP_EOL . PHP_EOL .
+            "Password ==> {$this->option('password')}" . PHP_EOL . PHP_EOL .
             " remember to change your email and password to avoid hackers when in production! \n" . PHP_EOL);
             die();
         }
@@ -60,8 +59,7 @@ class CreateDefaultMasterAdmin extends Command
         // Insert User in DB
         $user = User::create([
             'first_name'=> $first_name,
-            'last_name'=> $last_name,
-            'gender' => 'unconfirmed',
+            'gender' => 'uninformed',
             'email'=> $email,
             'password'=> $password,
             'email_verified_at' => now(),
@@ -85,9 +83,9 @@ class CreateDefaultMasterAdmin extends Command
 
         $user->assignRole('root');
 
-        print(PHP_EOL ."The default administrator user has been created successfully. ". PHP_EOL . PHP_EOL . 
+        print(PHP_EOL ."The default administrator user has been created successfully. ". PHP_EOL . PHP_EOL .
         "Email ==> {$email}" . PHP_EOL.
-        "Password ==> admin" . PHP_EOL . PHP_EOL . 
+        "Password ==> admin" . PHP_EOL . PHP_EOL .
         " remember to change email and password to avoid hackers when in production! \n" . PHP_EOL);
 
 

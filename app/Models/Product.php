@@ -23,11 +23,11 @@ class Product extends Model
     ];
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class,"products_categories","product_id","category_id");
+        return $this->belongsToMany(Category::class,"products_categories","product_id","category_id")->withTimestamps();
     }
 
     public function photos(): HasMany
     {
-        return $this->hasMany(ProductPhoto::class,'product_id');
+        return $this->hasMany(ProductPhoto::class);
     }
 }

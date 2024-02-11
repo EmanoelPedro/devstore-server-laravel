@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreCategoryRequest extends FormRequest
 {
@@ -11,6 +12,14 @@ class StoreCategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        if(!Auth::check()) {
+            return false;
+        }
+
+        $user = Auth::user();
+        if($user->hasPermissionTo("create products")) {
+            return true;
+        }
         return false;
     }
 
@@ -22,7 +31,7 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required']
         ];
     }
 }

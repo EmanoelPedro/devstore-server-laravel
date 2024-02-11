@@ -17,7 +17,7 @@
         </div>
 
         <div class="mt-4">
-            <select name="gender" id="gender" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+            <select name="gender" id="gender" class="border-gray-300 focus:border-purple-600 focus:ring-purple-600 rounded-md shadow-sm">
                 <option value="uninformed" selected>Prefer not to say</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -57,11 +57,11 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
 
-            <x-primary-button class="ms-4">
+            <x-primary-button class="ms-4 bg-purple-600 focus:ring-purple-600 focus:bg-purple-600 hover:ring-purple-500">
                 {{ __('Register') }}
             </x-primary-button>
         </div>

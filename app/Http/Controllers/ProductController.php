@@ -57,7 +57,7 @@ class ProductController extends Controller
     {
         $data = $request->validated();
 
-        $product = Product::find($data['product_id'])->first();
+        $product = Product::find($data['product_id']);
 
         if(!$product) {
             return response()->json([
@@ -79,10 +79,9 @@ class ProductController extends Controller
         if(empty($photoPath)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error savc8ing image'
+                'message' => 'Error saving image'
             ]);
         }
-
 
         $photo = $product->photos()->create([
            'product_id' => $data['product_id'],
@@ -106,9 +105,11 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show(string $product)
     {
-        //
+        $product = Product::where('slug', $product)->first();
+        return view('product', ['product' => $product, 'photos'=> $product->photos->all()]);
+        var_dump($product);
     }
 
     /**
@@ -174,42 +175,24 @@ class ProductController extends Controller
 
         $quantity = (!empty($data['quantity'])) ? $data['quantity'] : 1;
 
-        if(!$request->session()->has('cart')) {
-
-            $request->session()->put('cart.products', [] );
-
-        }
-
-
-
-        if(session()->has("cart.products.{$productId}")) {
-
-            $request->session()->increment("cart.products.{$productId}.quantity",$quantity);
-
-        } else {
-            $request->session()->put("cart.products.{$productId}",  ['quantity' => $quantity] );
-            }
-
-            $request->session()->save();
-
-
         $user = Auth::user();
 
         if(!empty($user) && $user->addToCart($productId, $quantity) !== false) {
           return response()->json([
                 'status' => 'success',
                 'message' => 'product added successfully',
-                'product_quantity' => $request->session()->get("cart.products.{$productId}.quantity")
-            ]);
+              'product_id' => $data['product_id'],
+              'product_quantity' => $user->getOpenCart()->products()->find($productId)->pivot->quantity
+            ], 201);
         } else {
             return response()->json([
                 'status' => 'error',
                 'message' => 'failed to add the product'
-            ]);
+            ], 400);
         }
     }
 
-    public function removeToCart(Request $request)
+    public function removeFromCart(Request $request)
     {
         $data = $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -220,57 +203,25 @@ class ProductController extends Controller
 
         $quantity = (!empty($data['quantity'])) ? $data['quantity'] : 1;
 
-        if(!$request->session()->has('cart')) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'failed to remove the product'
-            ]);
-
-        }
-
-        if (!session()->has("cart.products.{$productId}")) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'failed to remove the product'
-            ]);
-        }
-
-        if(session()->get("cart.products.{$productId}.quantity") > 0) {
-
-            if (session()->get("cart.products.{$productId}.quantity") < $data['quantity']) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'failed to remove the product'
-                ]);
-            }
-
-            $request->session()->decrement("cart.products.{$productId}.quantity",$quantity);
-            if (session()->get("cart.products.{$productId}.quantity") == 0) {
-                $request->session()->forget("cart.products.{$productId}");
-            }
-
-        } else {
-            response()->json([
-                'status' => 'error',
-                'message' => 'failed to remove the product'
-            ]);
-        }
-
-            $request->session()->save();
-
-
         $user = Auth::user();
 
-        if(!empty($user) && $user->removeToCart($productId, $quantity) !== false) {
+        if(!empty($user) && $user->removeFromCart($productId, $quantity) !== false) {
+                $qtd = 0;
+            if ($user->getOpenCart()->products()->find($productId)) {
+                $qtd = $user->getOpenCart()->products()->find($productId)->pivot->quantity;
+            }
+
           return response()->json([
-                'status' => 'sucucess',
+                'status' => 'success',
                 'message' => 'product removed successfully',
-            ]);
+                'product_id' => $data['product_id'],
+                'product_quantity' => $qtd
+            ], 201);
         } else {
             return response()->json([
                 'status' => 'error',
                 'message' => 'failed to add the product'
-            ]);
+            ], 400);
         }
     }
 }

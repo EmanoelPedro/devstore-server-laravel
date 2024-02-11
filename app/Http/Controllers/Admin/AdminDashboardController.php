@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class AdminDashboardController extends Controller
         });
     }
 
-    public function home() 
+    public function home()
     {
         $user = User::find(Auth::id());
         $permissions =(array)Auth::user()->getPermissionsViaRoles()->all();
@@ -33,9 +34,9 @@ class AdminDashboardController extends Controller
         return View('admin.dashboard');
     }
 
-    public function createProduct() 
+    public function createProduct()
     {
-        return View('admin.product.create-product');
+        return View('admin.product.create-product', ['categories' => Category::all()]);
     }
 
     public function editProduct($id)
