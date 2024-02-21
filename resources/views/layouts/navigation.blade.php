@@ -1,9 +1,12 @@
 @php
     $isLogged = \Illuminate\Support\Facades\Auth::check();
+    $categories = \App\Models\Category::all();
+
+    $cartNumItems = 0;
     if($isLogged){
     $user = \Illuminate\Support\Facades\Auth::user();
     $cart = \Illuminate\Support\Facades\Auth::user()->carts()->where('status', 'open')->first();
-    $cart->products()->count();
+    $cartNumItems = $cart->products()->count();
 }
 @endphp
 <nav x-data="{ open: false }" class="max-w-full bg-white mb-6 border-b border-gray-100">
@@ -32,10 +35,11 @@
             <div class="flex justify-end">
                 <!-- Cart -->
                 <div class="flex flex-row justify-center items-center sm:ms-6 ml-0">
-                   @if($isLogged && $cart->products()->count() > 0)
-                    <span class="block text-white text-center text-sm bg-purple-600 rounded-full w-[20px] h-[20px] mt-1 mr-[-5px]">{{$cart->products()->count()}}</span>
-                    @endif
-                    <a href="{{route('cart.show')}}" class="icon-shopping-cart text-3xl hover:text-purple-800"></a>
+
+                    <span
+                        class="{{($cartNumItems) ? '' : 'hidden ' }}cart-icon-products-quantity block text-white text-center text-sm bg-purple-600 rounded-full w-[20px] h-[20px] mt-1 mr-[-5px]">{{$cartNumItems}}</span>
+                    <a href="{{route('cart.show')}}"
+                       class="cart-icon-products icon-shopping-cart text-3xl hover:text-purple-800"></a>
                 </div>
                 <!-- Settings Dropdown -->
                 <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -163,51 +167,30 @@
 
     <div class="bg-purple-600 shadow md:px-12">
         <div class=" flex flex-row mx-auto py-3 lg:container lg:m-auto mb:px-4 mb:mx-auto">
-            <x-dropdown align="left">
-                <x-slot name="trigger">
-                    <button
-                        class="inline-flex items-center px-2 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-black bg-none hover:text-gray-100 focus:outline-none transition ease-in-out duration-150">
-                        Clothing
-                        <div class="ms-1">
-                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                      clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                    </button>
+{{--            <x-dropdown align="left">--}}
+{{--                <x-slot name="trigger">--}}
+{{--                    <button--}}
+{{--                        class="inline-flex items-center px-2 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-black bg-none hover:text-gray-100 focus:outline-none transition ease-in-out duration-150">--}}
+{{--                        Clothing--}}
+{{--                        <div class="ms-1">--}}
+{{--                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">--}}
+{{--                                <path fill-rule="evenodd"--}}
+{{--                                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"--}}
+{{--                                      clip-rule="evenodd"/>--}}
+{{--                            </svg>--}}
+{{--                        </div>--}}
+{{--                    </button>--}}
 
-                </x-slot>
-                <x-slot name="content">
-                    <x-dropdown-link :href="route('categories.index')">All Categories</x-dropdown-link>
-                    <x-dropdown-link :href="route('categories.index')">T-shirts</x-dropdown-link>
-                    <x-dropdown-link :href="route('categories.index')">Sweatshirts</x-dropdown-link>
-                </x-slot>
-            </x-dropdown>
-
-            <x-dropdown align="left">
-                <x-slot name="trigger">
-                    <button
-                        class="inline-flex items-center px-2 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-black text-lg bg-none hover:text-gray-100 focus:outline-none transition ease-in-out duration-150">
-                        Phone Cases
-
-                        <div class="ms-1">
-                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                      clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                    </button>
-                </x-slot>
-
-                <x-slot name="content">
-                    <x-dropdown-link :href="route('categories.index')">All Categories</x-dropdown-link>
-                    <x-dropdown-link :href="route('categories.index')">Iphone Cases</x-dropdown-link>
-                    <x-dropdown-link :href="route('categories.index')">Sansung Cases</x-dropdown-link>
-                </x-slot>
-            </x-dropdown>
-
+{{--                </x-slot>--}}
+{{--                <x-slot name="content">--}}
+{{--                    <x-dropdown-link :href="route('categories.index')">All Categories</x-dropdown-link>--}}
+{{--                    <x-dropdown-link :href="route('categories.index')">T-rat</x-dropdown-link>--}}
+{{--                    <x-dropdown-link :href="route('categories.index')">Sweatshirts</x-dropdown-link>--}}
+{{--                </x-slot>--}}
+{{--            </x-dropdown>--}}
+            @foreach($categories as $category)
+                <a class="inline-flex items-center px-2 py-2 border border-transparent text-xl leading-4 font-medium rounded-md text-black bg-none hover:text-gray-100 focus:outline-none transition ease-in-out duration-150"  href="{{route('categories.show',$category->slug)}}">{{$category->name}}</a>
+            @endforeach
         </div>
     </div>
 </nav>

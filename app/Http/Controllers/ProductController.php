@@ -21,7 +21,7 @@ class ProductController extends Controller
     {
         $product = Product::find($id)->first();
         $photos = $product->photos->all();
-        return view('product', ['product' => $product, 'photos'=> $photos]);
+        return view('product', ['product' => $product, 'photos' => $photos]);
     }
 
     /**
@@ -40,12 +40,12 @@ class ProductController extends Controller
 
         $data = $request->validated();
 
-        $data['slug'] = Str::slug($data['name'],'-');
+        $data['slug'] = Str::slug($data['name'], '-');
         $data['code'] = Str::upper(Str::random(8));
 
         $product = Product::create($data);
 
-        if($product->id) {
+        if ($product->id) {
             return response()->json([
                 'status' => 'success',
                 'message' => 'Product registered successfully'
@@ -59,24 +59,24 @@ class ProductController extends Controller
 
         $product = Product::find($data['product_id']);
 
-        if(!$product) {
+        if (!$product) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Product does not exist'
             ]);
-        } else if ($product->photos()->where('order','=',$data['order'])->exists()) {
+        } else if ($product->photos()->where('order', '=', $data['order'])->exists()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'error saving image'
             ]);
         }
 
-        $photoPath = $request->file('photo')->storePublicly("products/{$data['product_id']}",'public');
+        $photoPath = $request->file('photo')->storePublicly("products/{$data['product_id']}", 'public');
 
-        $photoUrl = asset("storage/" .$request->file('photo')
-                ->storePublicly("products/{$data['product_id']}",'public'));
+        $photoUrl = asset("storage/" . $request->file('photo')
+                ->storePublicly("products/{$data['product_id']}", 'public'));
 
-        if(empty($photoPath)) {
+        if (empty($photoPath)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error saving image'
@@ -84,13 +84,13 @@ class ProductController extends Controller
         }
 
         $photo = $product->photos()->create([
-           'product_id' => $data['product_id'],
-           'order' => $data['order'],
-           'path' => $photoPath,
-           'url' => $photoUrl
+            'product_id' => $data['product_id'],
+            'order' => $data['order'],
+            'path' => $photoPath,
+            'url' => $photoUrl
         ]);
 
-        if(!$photo){
+        if (!$photo) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error saving image'
@@ -102,13 +102,14 @@ class ProductController extends Controller
             'message' => 'Image saved successfully'
         ]);
     }
+
     /**
      * Display the specified resource.
      */
     public function show(string $product)
     {
         $product = Product::where('slug', $product)->first();
-        return view('product', ['product' => $product, 'photos'=> $product->photos->all()]);
+        return view('product', ['product' => $product, 'photos' => $product->photos->all()]);
         var_dump($product);
     }
 
@@ -137,7 +138,7 @@ class ProductController extends Controller
     {
         $product = Product::find($product);
 
-        if(!$product) {
+        if (!$product) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'failed to delete product'
@@ -151,7 +152,7 @@ class ProductController extends Controller
         // }
 
         $result = $product->delete();
-        if($result == true) {
+        if ($result == true) {
             return response()->json([
                 'status' => 'success',
                 'message' => 'product deleted successfully'
@@ -177,12 +178,15 @@ class ProductController extends Controller
 
         $user = Auth::user();
 
-        if(!empty($user) && $user->addToCart($productId, $quantity) !== false) {
-          return response()->json([
+        if (!empty($user) && $user->addToCart($productId, $quantity) !== false) {
+            return response()->json([
                 'status' => 'success',
                 'message' => 'product added successfully',
-              'product_id' => $data['product_id'],
-              'product_quantity' => $user->getOpenCart()->products()->find($productId)->pivot->quantity
+                'product_id' => $data['product_id'],
+                'product_quantity' => $user->getOpenCart()->products()->find($productId)->pivot->quantity,
+                'product_price' => $user->getOpenCart()->products()->find($productId)->price,
+                'cart_total_items' => $user->getOpenCart()->products()->count(),
+                'cart_total_value' => $user->getOpenCart()->getTotalValue()
             ], 201);
         } else {
             return response()->json([
@@ -205,17 +209,20 @@ class ProductController extends Controller
 
         $user = Auth::user();
 
-        if(!empty($user) && $user->removeFromCart($productId, $quantity) !== false) {
-                $qtd = 0;
+        if (!empty($user) && $user->removeFromCart($productId, $quantity) !== false) {
+            $qtd = 0;
             if ($user->getOpenCart()->products()->find($productId)) {
                 $qtd = $user->getOpenCart()->products()->find($productId)->pivot->quantity;
             }
 
-          return response()->json([
+            return response()->json([
                 'status' => 'success',
                 'message' => 'product removed successfully',
                 'product_id' => $data['product_id'],
-                'product_quantity' => $qtd
+                'product_quantity' => $qtd,
+                'product_price' => Product::find($productId)->price,
+                'cart_total_items' => $user->getOpenCart()->products()->count(),
+                'cart_total_value' => $user->getOpenCart()->getTotalValue(),
             ], 201);
         } else {
             return response()->json([

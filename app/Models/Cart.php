@@ -26,4 +26,14 @@ class Cart extends Model
     {
         return $this->belongsToMany(Product::class, 'carts_products','cart_id','product_id','id','id')->withPivot('quantity');
     }
+
+    public function getTotalValue(): float|int
+    {
+     $products = $this->products()->get();
+        $total = 0;
+        foreach ($products as $product) {
+            $total += $product->price * $product->pivot->quantity;
+        }
+        return $total;
+    }
 }

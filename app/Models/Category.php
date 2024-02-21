@@ -9,6 +9,8 @@ class Category extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['name','color','description','slug'];
+
     public function products()
     {
         return $this->belongsToMany(Product::class,"products_categories","category_id","product_id")->withTimestamps();

@@ -46,4 +46,19 @@ class AdminDashboardController extends Controller
         return View('admin.product.edit-product',['product' => $product, 'photos' => $product->photos->all()]);
 
     }
+
+    public function categories()
+    {
+        $categories = Category::all();
+        return view('admin.category.categories',['categories' => $categories]);
+    }
+
+    public function createCategory()
+    {
+        return view('admin.category.create-category');
+    }
+    public function editCategory()
+    {
+        return view('admin.category.create-category');
+    }
 }

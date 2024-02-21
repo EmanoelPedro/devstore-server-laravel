@@ -39,13 +39,22 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function()
         Route::get('/', [AdminDashboardController::class, 'home'])->name('admin.dashboard.home');
 
         Route::get('/products', [AdminDashboardController::class, 'home'])
-            ->name('admin.dashboard.products');
+            ->name('admin.dashboard.products.index');
 
         Route::get('/products/create', [AdminDashboardController::class, 'createProduct'])
             ->name('admin.dashboard.products.create');
 
         Route::get('/products/edit/{id}', [AdminDashboardController::class, 'editProduct'])
             ->name('admin.dashboard.products.edit');
+
+        Route::get('/categories', [AdminDashboardController::class, 'categories'])
+            ->name('admin.dashboard.categories.index');
+
+        Route::get('/categories/create', [AdminDashboardController::class, 'createCategory'])
+            ->name('admin.dashboard.categories.create');
+
+        Route::get('/categories/edit/{id}', [CategoryController::class, 'edit'])
+            ->name('admin.dashboard.categories.edit');
     });
 
 });
@@ -73,20 +82,21 @@ Route::get('/email/verify', function ()
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
+    $request->fulfill();
 
     return redirect()->route('site.home');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 // Category Routes
-Route::get('categories/{slug}',[CategoryController::class, 'show'])->name('categories.show');
-Route::middleware(['auth','verified'])->prefix('categories')->group(function() {
-    Route::get('create',[CategoryController::class, 'create'])->name('categories.create');
-    Route::post('create',[CategoryController::class, 'store'])->name('categories.store');
-    Route::delete('delete/{id}',[CategoryController::class, 'destroy'])->name('categories.delete');
-    Route::put('update',[CategoryController::class, 'destroy'])->name('categories.update');
+Route::get('category/{slug}',[CategoryController::class, 'show'])->name('categories.show');
 
-    Route::post('addproduct', [CategoryController::class, 'addProduct'])->name('categories.addproduct');
-    Route::post('removeproduct', [CategoryController::class, 'removeProduct'])->name('categories.removeproduct');
+Route::middleware(['auth','verified'])->prefix('categories')->group(function() {
+    Route::post('/',[CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/',[CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/',[CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    Route::post('add-product', [CategoryController::class, 'addProduct'])->name('categories.addproduct');
+    Route::post('remove-product', [CategoryController::class, 'removeProduct'])->name('categories.removeproduct');
 });
 
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
@@ -117,7 +127,8 @@ Route::middleware(['auth','verified'])->prefix('cart')->group(function() {
 
 // Checkout Routes
 Route::middleware(['auth','verified'])->prefix('checkout')->group(function(){
-    Route::get('payment',[CheckoutController::class, 'create']);
+    Route::get('payment',[CheckoutController::class, 'create'])->name('checkout.create');
+    Route::get('payment/success',[CheckoutController::class, 'PaymentSuccess'])->name('checkout.paymentSuccess');
 
 });
 Route::post('checkout/payment/webhook',[CheckoutController::class, 'paymentStatusWebhook'])->name('checkout.paymentStatusResponse');

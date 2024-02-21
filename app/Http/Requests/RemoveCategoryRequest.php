@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class StoreCategoryRequest extends FormRequest
+class RemoveCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +17,7 @@ class StoreCategoryRequest extends FormRequest
         }
 
         $user = Auth::user();
-        if($user->hasPermissionTo("create categories")) {
+        if($user->hasPermissionTo("remove categories")) {
             return true;
         }
         return false;
@@ -31,9 +31,7 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required'],
-            'color' => ['required'],
-            'description' => ['required'],
+            'id' =>  ['required', 'numeric'],
         ];
     }
 }

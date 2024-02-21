@@ -57,8 +57,8 @@ class CheckoutController extends Controller
             ],
             'customer_email' => \Auth::user()->email, // email do cliente
             'mode' => 'payment',
-            'success_url' => 'https://example.com/success',
-            'cancel_url' => route('cart.index'),
+            'success_url' => route('checkout.paymentSuccess'),
+            'cancel_url' => route('cart.show'),
             ]);
        return redirect($session->url, 303);
     }
@@ -195,6 +195,11 @@ class CheckoutController extends Controller
         }
 
         http_response_code(200);
+    }
+
+    public function PaymentSuccess()
+    {
+        echo "Deu certo meu mano! ";
     }
 
     /**

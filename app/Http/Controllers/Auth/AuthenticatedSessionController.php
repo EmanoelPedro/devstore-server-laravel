@@ -28,6 +28,8 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        $user = $request->user();
+        session()->put('user', $user->toArray());
 
         $cart = $request->user()->carts();
 
