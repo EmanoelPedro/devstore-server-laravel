@@ -38,7 +38,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function()
 
         Route::get('/', [AdminDashboardController::class, 'home'])->name('admin.dashboard.home');
 
-        Route::get('/products', [AdminDashboardController::class, 'home'])
+        Route::get('/products', [AdminDashboardController::class, 'products'])
             ->name('admin.dashboard.products.index');
 
         Route::get('/products/create', [AdminDashboardController::class, 'createProduct'])
@@ -108,7 +108,6 @@ Route::middleware(['auth','verified'])->prefix('products')->group(function() {
     Route::delete('delete/{id}',[ProductController::class, 'destroy'])->name('products.delete');
     Route::put('update',[ProductController::class, 'destroy'])->name('products.update');
     Route::post('addphoto',[ProductController::class, 'addphoto'])->name('products.addphoto');
-
     Route::post('add-to-cart',[ProductController::class, 'addToCart'])->name('products.addToCart');
     Route::post('remove-from-cart',[ProductController::class, 'removeFromCart'])->name('products.removeFromCart');
 });

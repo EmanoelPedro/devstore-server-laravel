@@ -8,7 +8,7 @@
     </x-carousel>
     @php
         foreach ($categories as $category):
-           $products = $category->products()->get();
+           $products = $category->products()->where('status', '=', 'published')->get();
     @endphp
     <section class="flex flex-wrap py-10 px-11 lg:container lg:m-auto">
         <header class="w-full mb-5">

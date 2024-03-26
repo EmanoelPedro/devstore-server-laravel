@@ -1,9 +1,4 @@
 <x-admin-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Categories') }}
-        </h2>
-    </x-slot>
     <div class="px-12 py-10 m-5 bg-white rounded-lg shadow-lg">
         <h2 class="text-2xl font-semibold">Categories</h2>
         <div class="mt-4">

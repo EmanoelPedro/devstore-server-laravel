@@ -34,6 +34,12 @@ class AdminDashboardController extends Controller
         return View('admin.dashboard');
     }
 
+    public function products()
+    {
+        $products = Product::all();
+        return \view('admin.product.products', ['products' => $products]);
+    }
+
     public function createProduct()
     {
         return View('admin.product.create-product', ['categories' => Category::all()]);

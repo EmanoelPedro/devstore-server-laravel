@@ -54,18 +54,18 @@
                 <span class="block sm:inline">Please fill in all the fields</span>
             </x-slot>
         </x-alert-popup>
-        <div class="min-h-screen ml-64 w-full max-w-full bg-gray-100 mb:ml-3">
+        <div class="min-h-screen ml-64 w-full mt-[82px] max-w-full bg-gray-100 mb:ml-3">
             <!-- Page Heading -->
             @if (isset($header))
                 <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-7xl mx-auto pt-6 pb-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 </header>
             @endif
 
             <!-- Page Content -->
-            <main class="max-w-[calc(100%-64px)] mb:max-w-full">
+            <main class="mb:max-w-full overflow-y-auto">
                 {{ $slot }}
             </main>
         </div>

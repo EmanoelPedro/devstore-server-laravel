@@ -142,7 +142,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'failed to delete product'
-            ]);
+            ], 400);
         }
         // if($product->photos->isNotEmpty()){
         //     foreach($product->photos as $photo) {
@@ -151,18 +151,18 @@ class ProductController extends Controller
         //     }
         // }
 
-        $result = $product->delete();
-        if ($result == true) {
+        // $result = $product->delete();
+        if ($result = true) {
             return response()->json([
                 'status' => 'success',
                 'message' => 'product deleted successfully'
-            ]);
+            ], 200);
         }
 
         return response()->json([
             'status' => 'error',
             'message' => 'failed to delete product'
-        ]);
+        ], 400);
     }
 
     public function addToCart(Request $request)
